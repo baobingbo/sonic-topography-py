@@ -1,0 +1,17 @@
+node_modules/
+build/
+dist/
+dist-mac/
+dist-wallpaper/
+coverage/
+data/
+docs/
+sonic-city/
+SONIC_TOPOGRAPHY_STYLE.md
+sonic-topography-douyin-cover*.png
+.DS_Store
+*.log
+*.exe
+*.exe~
+.env*
+!.env.example
