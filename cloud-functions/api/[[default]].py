@@ -116,7 +116,7 @@ def create_default_playlists():
         {"id": "visual-set", "name": "Visual Set", "songs": []},
     ]
 
-@app.get("/api/playlists")
+@app.get("/playlists")
 async def get_playlists():
     if PLAYLISTS_PATH.exists():
         with open(PLAYLISTS_PATH, 'r', encoding='utf-8') as f:
@@ -127,7 +127,7 @@ async def get_playlists():
                 pass
     return {"playlists": create_default_playlists()}
 
-@app.put("/api/playlists")
+@app.put("/playlists")
 async def save_playlists(request: Request):
     data = await request.json()
     playlists = data.get("playlists", [])
@@ -145,7 +145,7 @@ async def save_playlists(request: Request):
 # --------------------
 # 音频流代理 (核心修复)
 # --------------------
-@app.get("/api/netease/audio")
+@app.get("/netease/audio")
 async def proxy_netease_audio(id: str, request: Request):
     """
     对应 Node.js 原始逻辑: /api/netease/audio?id=xxx
@@ -222,7 +222,7 @@ async def proxy_netease_audio(id: str, request: Request):
 # --------------------
 # 其他网易云 API 代理
 # --------------------
-@app.get("/api/netease/url")
+@app.get("/netease/url")
 async def get_netease_url(id: str, request: Request):
     cookie = read_netease_cookie(request)
     cache_key = f"{id}::{cookie}"
@@ -244,7 +244,7 @@ async def get_netease_url(id: str, request: Request):
         }
     return {"url": playable_url}
 
-@app.get("/api/netease/lyric")
+@app.get("/netease/lyric")
 async def get_netease_lyric(id: str, request: Request):
     cookie = read_netease_cookie(request)
     url = f"https://music.163.com/api/song/lyric?id={id}&lv=-1&kv=-1&tv=-1"
@@ -257,7 +257,7 @@ async def get_netease_lyric(id: str, request: Request):
         "translatedLyric": data.get("tlyric", {}).get("lyric", "")
     }
 
-@app.get("/api/netease/search")
+@app.get("/netease/search")
 async def search_netease(keywords: str, limit: int = 50, request: Request = None):
     if not keywords:
         raise HTTPException(status_code=400, detail="Missing keywords")
@@ -295,7 +295,7 @@ async def search_netease(keywords: str, limit: int = 50, request: Request = None
         })
     return {"songs": songs}
 
-@app.get("/api/netease/liked")
+@app.get("/netease/liked")
 async def get_liked_songs(request: Request):
     cookie = read_netease_cookie(request)
     uid = extract_uid_from_cookie(cookie)
@@ -307,7 +307,7 @@ async def get_liked_songs(request: Request):
         resp = await client.get(url, headers=headers, timeout=10.0)
         return resp.json()
 
-@app.get("/api/netease/playlists")
+@app.get("/netease/playlists")
 async def get_user_playlists(request: Request):
     cookie = read_netease_cookie(request)
     uid = extract_uid_from_cookie(cookie)
@@ -319,7 +319,7 @@ async def get_user_playlists(request: Request):
         resp = await client.get(url, headers=headers, timeout=10.0)
         return resp.json()
 
-@app.get("/api/netease/playlist")
+@app.get("/netease/playlist")
 async def get_playlist_detail(id: str, request: Request):
     cookie = read_netease_cookie(request)
     url = f"https://music.163.com/api/v6/playlist/detail?id={id}&n=1000"
@@ -328,7 +328,7 @@ async def get_playlist_detail(id: str, request: Request):
         resp = await client.get(url, headers=headers, timeout=10.0)
         return resp.json()
 
-@app.get("/api/netease/daily-recommend")
+@app.get("/netease/daily-recommend")
 async def get_daily_recommend(request: Request):
     cookie = read_netease_cookie(request)
     if not cookie:
@@ -342,7 +342,7 @@ async def get_daily_recommend(request: Request):
 # --------------------
 # Cookie 管理
 # --------------------
-@app.put("/api/netease/cookie")
+@app.put("/netease/cookie")
 async def set_netease_cookie(request: Request):
     global browser_netease_cookie
     try:
@@ -360,7 +360,7 @@ async def set_netease_cookie(request: Request):
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
 
-@app.get("/api/netease/cookie")
+@app.get("/netease/cookie")
 async def get_netease_cookie():
     global browser_netease_cookie
     account = await get_netease_account(browser_netease_cookie)
